@@ -2,41 +2,58 @@
 #include <stdlib.h>
 #include <string.h>
 
+int comparar(const void *a, const void *b) {
+    // Convertir los punteros void a punteros a cadenas de caracteres
+    const char *str1 = *(const char **)a;
+    const char *str2 = *(const char **)b;
+
+    // Comparar las cadenas utilizando strcmp
+    return strcmp(str1, str2);
+}
+
 int main (){
 
 FILE * readFile;
-char caca[100];
 
 readFile = fopen("nombres.txt", "r");
+FILE * writeFile = fopen("nombres-ordenados.txt", "w");
+
+
 
 if(readFile==NULL){
   printf("Ha ocurrido un error");
   return 1;
 }
+int sizeArray = 0;
 
-int tamañoArray = 6;
-
-int i = 0;
-char * nombres[tamañoArray];
+char * nombre = (char*)malloc(20*sizeof(char));
 
 while (!feof(readFile))
 {
-  if(fscanf(readFile, "%s", caca)!=EOF){
-  strcpy(*(nombres+i), caca);
-  printf("%s", nombres[i]);
-  i++;
+  if(fscanf(readFile, "%s", nombre)!=EOF)
+    sizeArray++;
+}
+
+char ** nombres = (char**)malloc(sizeArray*sizeof(char*));
+rewind(readFile);
+int cont = 0;
+while (!feof(readFile))
+{ 
+  if(fscanf(readFile, "%s", nombre)!=EOF){
+    nombres[cont] = (char*)malloc(20*sizeof(char));
+    printf("%s \n", nombre);
+    strcpy(nombres[cont], nombre);
+    cont++;
   }
 }
-printf("%d", i);
 
+qsort(nombres, sizeArray, sizeof(char *), comparar);
 
+for(int i = 0; i<sizeArray; i++)
+{
+  fprintf(writeFile, "%d %s \n"  , i+1,nombres[i]);
+}
 
-
-
-
-
-
-printf("\n La cantidad de palabras en el texto es: %d\n", tamañoArray);
 
 
 fclose(readFile);
